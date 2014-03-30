@@ -7,12 +7,12 @@ import android.view.*;
 
 import java.text.DecimalFormat;
 import java.util.*;
-import java.math.*;
 
 public class DaysView extends View {
 
     private static final String MY_TAG = "DMB_TAG";
     public static final int DELAY = 200;
+    public static final int TEXT_LINE_PROGRESS_SIZE = 10;
     private Thread runner;
     private List<MyDay> myDays;
 
@@ -28,7 +28,7 @@ public class DaysView extends View {
 
     private static final int TEXT_COLOR = Color.BLACK;
 
-    private static final int PROGRESS_LINE_MARGIN_Y = 20;
+    private static final int PROGRESS_LINE_MARGIN_Y = 45;
 
     private float x;
 
@@ -102,12 +102,14 @@ public class DaysView extends View {
 
     private void drawCalendar(Canvas c, Paint p) {
         // TODO: Implement this method
-        p.setTextSize(RECT_SIZE / 2);
-        p.setTextAlign(Paint.Align.CENTER);
+
         boolean currentDaySaved = false;
         int currentDayIndex = 0;
 
         drawCurrentDayProgress(c, p);
+
+        p.setTextSize(RECT_SIZE / 2);
+        p.setTextAlign(Paint.Align.CENTER);
 
         int col = 0;
         int row = 0;
@@ -197,17 +199,44 @@ public class DaysView extends View {
 
     private void drawCurrentDayProgress(Canvas c, Paint p) {
 
-        int secondsOfDay = MyDay.now.get(Calendar.HOUR_OF_DAY) * 60 * 60 + MyDay.now.get(Calendar.MINUTE) * 60 + MyDay.now.get(Calendar.SECOND);
-        int dayDurationInSeconds = 24 * 60 * 60;
-        double partCompleted = (secondsOfDay * 1f) / (dayDurationInSeconds * 1f);
+        int completedSeconds;
+        int allSeconds;
+        double partCompleted;
 
+        completedSeconds = MyDay.now.get(Calendar.HOUR_OF_DAY) * 60 * 60 + MyDay.now.get(Calendar.MINUTE) * 60 + MyDay.now.get(Calendar.SECOND);
+        allSeconds = 24 * 60 * 60;
+        partCompleted = (completedSeconds * 1f) / (allSeconds * 1f);
+
+
+        drawProgressLine(c, p, partCompleted, getHeight() - 25, "day");
+
+        completedSeconds = MyDay.now.get(Calendar.MINUTE) * 60 + MyDay.now.get(Calendar.SECOND);
+        allSeconds = 60 * 60;
+        partCompleted = (completedSeconds * 1f) / (allSeconds * 1f);
+
+
+        drawProgressLine(c, p, partCompleted, getHeight() - 13, "hour");
+
+        completedSeconds = MyDay.now.get(Calendar.SECOND);
+        allSeconds = 60;
+        partCompleted = (completedSeconds * 1f) / (allSeconds * 1f);
+
+
+        drawProgressLine(c, p, partCompleted, getHeight() - 1, "minute");
+
+
+    }
+
+    private void drawProgressLine(Canvas c, Paint p, double partCompleted, int lineY, String sign) {
         p.setAlpha(150);
         p.setStrokeWidth(2);
         p.setColor(Color.GRAY);
-        c.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1, p);
+        c.drawLine(0, lineY, getWidth(), lineY, p);
         p.setColor(Color.GREEN);
-        c.drawLine(0, getHeight() - 1, (int) (getWidth() * partCompleted), getHeight() - 1, p);
-
+        c.drawLine(0, lineY, (int) (getWidth() * partCompleted), lineY, p);
+        p.setTextAlign(Paint.Align.RIGHT);
+        p.setTextSize(TEXT_LINE_PROGRESS_SIZE);
+        c.drawText(sign, getWidth(), lineY - 2, p);
         p.setStrokeWidth(1);
         p.setAlpha(255);
 
