@@ -87,6 +87,9 @@ public class DaysView extends View {
             iterateCalendar.add(Calendar.DAY_OF_YEAR, 1);
         }
         MyDay.endDate = (Calendar) iterateCalendar.clone();
+        MyDay.endDate.set(Calendar.HOUR, 23);
+        MyDay.endDate.set(Calendar.MINUTE, 59);
+        MyDay.endDate.set(Calendar.SECOND, 59);
 
     }
 
@@ -104,13 +107,15 @@ public class DaysView extends View {
         boolean currentDaySaved = false;
         int currentDayIndex = 0;
 
+        drawCurrentDayProgress(c, p);
+
         int col = 0;
         int row = 0;
         int maxCol = getWidth() / (RECT_SIZE);
         int translateY = 20;
         c.translate(0, translateY);
-        List<MyDay> myDaysCloned = (List<MyDay>) ((ArrayList) myDays).clone();
-        for (MyDay myDay : myDaysCloned) {
+        List<MyDay> myDaysCopied = (List<MyDay>) ((ArrayList) myDays).clone();
+        for (MyDay myDay : myDaysCopied) {
             if (myDay.isCompleted()) {
                 if (myDay.day.get(Calendar.DAY_OF_YEAR) == MyDay.now.get(Calendar.DAY_OF_YEAR) &&
                         myDay.day.get(Calendar.YEAR) == MyDay.now.get(Calendar.YEAR)) {
@@ -121,7 +126,7 @@ public class DaysView extends View {
             } else {
 
                 if (!currentDaySaved) {
-                    currentDayIndex = myDaysCloned.indexOf(myDay);
+                    currentDayIndex = myDaysCopied.indexOf(myDay);
                     currentDaySaved = true;
                 }
                 p.setColor(notCompletedDayColor);
@@ -159,7 +164,7 @@ public class DaysView extends View {
         c.drawLine(MARGIN, RECT_SIZE / 2 + MARGIN / 2,
                 getWidth() - MARGIN, RECT_SIZE / 2 + MARGIN / 2, p);
 
-        c.drawText((myDaysCloned.get(0).day.get(Calendar.MONTH) + 1) + "." + myDaysCloned.get(0).day.get(Calendar.YEAR),
+        c.drawText((myDaysCopied.get(0).day.get(Calendar.MONTH) + 1) + "." + myDaysCopied.get(0).day.get(Calendar.YEAR),
                 getWidth() - 40, RECT_SIZE / 2, p);
 
 
@@ -177,13 +182,34 @@ public class DaysView extends View {
 
         c.drawLine(0, getHeight() - PROGRESS_LINE_MARGIN_Y, getWidth(),
                 getHeight() - PROGRESS_LINE_MARGIN_Y, p);
-        c.drawText(DAYS_COUNT - currentDayIndex + "", getWidth() - 40, getHeight() - PROGRESS_LINE_MARGIN_Y - 20, p);
+        int daysCompleted = currentDayIndex - 1;
+        int daysEstimated = DAYS_COUNT - daysCompleted;
+        c.drawText(daysEstimated + "", getWidth() - 40, getHeight() - PROGRESS_LINE_MARGIN_Y - 20, p);
         p.setColor(completedDayColor);
         c.drawLine(0, getHeight() - PROGRESS_LINE_MARGIN_Y, progressPixel,
                 getHeight() - PROGRESS_LINE_MARGIN_Y, p);
-        c.drawText(currentDayIndex + "", 40, getHeight() - PROGRESS_LINE_MARGIN_Y - 20, p);
+        c.drawText(daysCompleted + "", 40, getHeight() - PROGRESS_LINE_MARGIN_Y - 20, p);
         p.setTextSize(35);
         c.drawText(new DecimalFormat("#0.000000").format(progressPercent) + "%", getWidth() / 2, getHeight() - PROGRESS_LINE_MARGIN_Y - 20, p);
+
+
+    }
+
+    private void drawCurrentDayProgress(Canvas c, Paint p) {
+
+        int secondsOfDay = MyDay.now.get(Calendar.HOUR_OF_DAY) * 60 * 60 + MyDay.now.get(Calendar.MINUTE) * 60 + MyDay.now.get(Calendar.SECOND);
+        int dayDurationInSeconds = 24 * 60 * 60;
+        double partCompleted = (secondsOfDay * 1f) / (dayDurationInSeconds * 1f);
+
+        p.setAlpha(150);
+        p.setStrokeWidth(2);
+        p.setColor(Color.GRAY);
+        c.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1, p);
+        p.setColor(Color.GREEN);
+        c.drawLine(0, getHeight() - 1, (int) (getWidth() * partCompleted), getHeight() - 1, p);
+
+        p.setStrokeWidth(1);
+        p.setAlpha(255);
 
     }
 
