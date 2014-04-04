@@ -51,6 +51,7 @@ public class DaysView extends View {
                     try {
                         Thread.sleep(DELAY);
                     } catch (InterruptedException e) {
+                        Log.d(MY_TAG, " thread stopped");
                         e.printStackTrace();
                         break;
                     }
@@ -175,7 +176,7 @@ public class DaysView extends View {
         long completedMills = MyDay.now.getTimeInMillis() - MyDay.startDate.getTimeInMillis();
         long allMillis = MyDay.endDate.getTimeInMillis() - MyDay.startDate.getTimeInMillis();
         progressPercent = (((double) completedMills) / allMillis) * 100;
-        Log.d(MY_TAG, "completedMills: " + completedMills + " allMillis: " + allMillis);
+        //   Log.d(MY_TAG, "completedMills: " + completedMills + " allMillis: " + allMillis);
 
         int progressPixel = (int) Math.round(((float) getWidth() / 100f) * progressPercent);
 
@@ -237,6 +238,8 @@ public class DaysView extends View {
         p.setTextAlign(Paint.Align.RIGHT);
         p.setTextSize(TEXT_LINE_PROGRESS_SIZE);
         c.drawText(sign, getWidth(), lineY - 2, p);
+        c.drawText(new DecimalFormat("#0.000").format(partCompleted * 100) + "%", getWidth() / 2, lineY - 2, p);
+
         p.setStrokeWidth(1);
         p.setAlpha(255);
 
