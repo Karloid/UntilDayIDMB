@@ -88,9 +88,9 @@ public class DaysView extends View {
             iterateCalendar.add(Calendar.DAY_OF_YEAR, 1);
         }
         MyDay.endDate = (Calendar) iterateCalendar.clone();
-        MyDay.endDate.set(Calendar.HOUR, 23);
-        MyDay.endDate.set(Calendar.MINUTE, 59);
-        MyDay.endDate.set(Calendar.SECOND, 59);
+        MyDay.endDate.set(Calendar.HOUR, 0);
+        MyDay.endDate.set(Calendar.MINUTE, 0);
+        MyDay.endDate.set(Calendar.SECOND, 0);
 
     }
 
